@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import { JOB_STATUSES } from '~/types/job'
-import type { Job } from '~/types/job'
+import type { Job, JobStatus } from '~/types/job'
 import { useJobsStore } from '~/stores/jobs'
 
 const emit = defineEmits<{
   edit: [job: Job]
   delete: [id: string]
 }>()
+
+function handleMove(id: string, status: JobStatus) {
+  store.moveJob(id, status)
+}
 
 const store = useJobsStore()
 
@@ -45,6 +49,7 @@ const colStyles: Record<string, { dot: string; count: string }> = {
           :job="job"
           @edit="emit('edit', job)"
           @delete="emit('delete', job.id)"
+          @move="handleMove(job.id, $event)"
         />
 
         <!-- Empty state -->
