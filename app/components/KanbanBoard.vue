@@ -28,11 +28,11 @@ const colStyles: Record<string, { dot: string; count: string }> = {
 </script>
 
 <template>
-  <div class="flex gap-3 overflow-x-auto pb-4 sm:gap-4">
+  <div class="flex gap-3 overflow-x-auto pb-4 sm:grid sm:grid-cols-5 sm:overflow-visible sm:gap-4">
     <div
       v-for="col in JOB_STATUSES"
       :key="col.value"
-      class="flex w-60 shrink-0 flex-col rounded-xl border border-white/10 bg-slate-900/60 p-3 sm:w-auto sm:flex-1 sm:p-4"
+      class="flex w-60 shrink-0 flex-col rounded-xl border border-white/10 bg-slate-900/60 p-3 sm:w-auto sm:p-4"
     >
       <!-- Column header -->
       <div class="mb-4 flex items-center justify-between">
