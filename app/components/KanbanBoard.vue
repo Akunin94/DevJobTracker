@@ -32,7 +32,7 @@ const colStyles: Record<string, { dot: string; count: string }> = {
     <div
       v-for="col in JOB_STATUSES"
       :key="col.value"
-      class="flex w-64 shrink-0 flex-col rounded-xl border border-white/10 bg-slate-900/60 p-3 sm:w-72 sm:p-4"
+      class="flex w-60 shrink-0 flex-col rounded-xl border border-white/10 bg-slate-900/60 p-3 sm:w-auto sm:flex-1 sm:p-4"
     >
       <!-- Column header -->
       <div class="mb-4 flex items-center justify-between">
