@@ -3,16 +3,20 @@ import { JOB_STATUSES } from '~/types/job'
 import type { Job, JobStatus } from '~/types/job'
 import { useJobsStore } from '~/stores/jobs'
 
+const props = defineProps<{
+  filteredByStatus: (status: JobStatus) => Job[]
+}>()
+
 const emit = defineEmits<{
   edit: [job: Job]
   delete: [id: string]
 }>()
 
+const store = useJobsStore()
+
 function handleMove(id: string, status: JobStatus) {
   store.moveJob(id, status)
 }
-
-const store = useJobsStore()
 
 const colStyles: Record<string, { dot: string; count: string }> = {
   wishlist:  { dot: 'bg-slate-400',   count: 'bg-slate-800 text-slate-300' },
@@ -24,11 +28,11 @@ const colStyles: Record<string, { dot: string; count: string }> = {
 </script>
 
 <template>
-  <div class="flex gap-4 overflow-x-auto pb-4">
+  <div class="flex gap-3 overflow-x-auto pb-4 sm:gap-4">
     <div
       v-for="col in JOB_STATUSES"
       :key="col.value"
-      class="flex w-72 shrink-0 flex-col rounded-xl border border-white/10 bg-slate-900/60 p-4"
+      class="flex w-64 shrink-0 flex-col rounded-xl border border-white/10 bg-slate-900/60 p-3 sm:w-72 sm:p-4"
     >
       <!-- Column header -->
       <div class="mb-4 flex items-center justify-between">
@@ -37,14 +41,14 @@ const colStyles: Record<string, { dot: string; count: string }> = {
           <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-200">{{ col.label }}</h2>
         </div>
         <span class="rounded-full px-2 py-0.5 text-xs font-semibold" :class="colStyles[col.value].count">
-          {{ store.jobsByStatus(col.value).length }}
+          {{ props.filteredByStatus(col.value).length }}
         </span>
       </div>
 
       <!-- Cards -->
       <div class="flex flex-col gap-2.5">
         <JobCard
-          v-for="job in store.jobsByStatus(col.value)"
+          v-for="job in props.filteredByStatus(col.value)"
           :key="job.id"
           :job="job"
           @edit="emit('edit', job)"
@@ -54,7 +58,7 @@ const colStyles: Record<string, { dot: string; count: string }> = {
 
         <!-- Empty state -->
         <div
-          v-if="store.jobsByStatus(col.value).length === 0"
+          v-if="props.filteredByStatus(col.value).length === 0"
           class="flex flex-col items-center justify-center rounded-lg border border-dashed border-white/10 py-10 text-center"
         >
           <span class="mb-1 text-2xl">· · ·</span>
