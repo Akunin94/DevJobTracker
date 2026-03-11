@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import draggable from 'vuedraggable'
 import { JOB_STATUSES } from '~/types/job'
 import type { Job, JobStatus } from '~/types/job'
 import { useJobsStore } from '~/stores/jobs'
@@ -18,12 +19,18 @@ function handleMove(id: string, status: JobStatus) {
   store.moveJob(id, status)
 }
 
-const colStyles: Record<string, { dot: string; count: string }> = {
-  wishlist:  { dot: 'bg-slate-400',   count: 'bg-slate-800 text-slate-300' },
-  applied:   { dot: 'bg-blue-400',    count: 'bg-blue-900/60 text-blue-300' },
-  interview: { dot: 'bg-yellow-400',  count: 'bg-yellow-900/60 text-yellow-300' },
-  offer:     { dot: 'bg-emerald-400', count: 'bg-emerald-900/60 text-emerald-300' },
-  rejected:  { dot: 'bg-red-400',     count: 'bg-red-900/60 text-red-300' },
+function onDrop(colStatus: JobStatus, evt: { added?: { element: Job }; removed?: unknown }) {
+  if (evt.added) {
+    store.moveJob(evt.added.element.id, colStatus)
+  }
+}
+
+const colStyles: Record<string, { dot: string; count: string; drag: string }> = {
+  wishlist:  { dot: 'bg-slate-400',   count: 'bg-slate-800 text-slate-300',         drag: 'border-slate-400/40' },
+  applied:   { dot: 'bg-blue-400',    count: 'bg-blue-900/60 text-blue-300',         drag: 'border-blue-400/40' },
+  interview: { dot: 'bg-yellow-400',  count: 'bg-yellow-900/60 text-yellow-300',     drag: 'border-yellow-400/40' },
+  offer:     { dot: 'bg-emerald-400', count: 'bg-emerald-900/60 text-emerald-300',   drag: 'border-emerald-400/40' },
+  rejected:  { dot: 'bg-red-400',     count: 'bg-red-900/60 text-red-300',           drag: 'border-red-400/40' },
 }
 </script>
 
@@ -46,25 +53,34 @@ const colStyles: Record<string, { dot: string; count: string }> = {
       </div>
 
       <!-- Cards -->
-      <div class="flex flex-col gap-2.5">
-        <JobCard
-          v-for="job in props.filteredByStatus(col.value)"
-          :key="job.id"
-          :job="job"
-          @edit="emit('edit', job)"
-          @delete="emit('delete', job.id)"
-          @move="handleMove(job.id, $event)"
-        />
-
-        <!-- Empty state -->
-        <div
-          v-if="props.filteredByStatus(col.value).length === 0"
-          class="flex flex-col items-center justify-center rounded-lg border border-dashed border-white/10 py-10 text-center"
-        >
-          <span class="mb-1 text-2xl">· · ·</span>
-          <p class="text-xs text-slate-500">No jobs here yet</p>
-        </div>
-      </div>
+      <draggable
+        :model-value="props.filteredByStatus(col.value)"
+        group="jobs"
+        item-key="id"
+        class="flex flex-1 flex-col gap-2.5"
+        ghost-class="opacity-30"
+        drag-class="rotate-1 scale-105"
+        :class="{ [colStyles[col.value].drag]: true }"
+        @change="onDrop(col.value, $event)"
+      >
+        <template #item="{ element: job }">
+          <JobCard
+            :job="job"
+            @edit="emit('edit', job)"
+            @delete="emit('delete', job.id)"
+            @move="handleMove(job.id, $event)"
+          />
+        </template>
+        <template #footer>
+          <div
+            v-if="props.filteredByStatus(col.value).length === 0"
+            class="flex flex-col items-center justify-center rounded-lg border border-dashed border-white/10 py-10 text-center"
+          >
+            <span class="mb-1 text-2xl">· · ·</span>
+            <p class="text-xs text-slate-500">No jobs here yet</p>
+          </div>
+        </template>
+      </draggable>
     </div>
   </div>
 </template>
