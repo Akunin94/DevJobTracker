@@ -43,7 +43,7 @@ function moveTo(status: JobStatus) {
 </script>
 
 <template>
-  <div class="group relative rounded-lg border border-white/10 bg-slate-800/80 p-3.5 transition-all hover:border-white/20 hover:bg-slate-800">
+  <div class="group relative cursor-grab rounded-lg border border-white/10 bg-slate-800/80 p-3.5 transition-all hover:border-white/20 hover:bg-slate-800 active:cursor-grabbing">
     <!-- Company + position -->
     <NuxtLink :to="`/jobs/${job.id}`" class="block truncate text-sm font-semibold text-white hover:text-blue-300 transition-colors">{{ job.company }}</NuxtLink>
     <p class="mt-0.5 truncate text-xs text-slate-400">{{ job.position }}</p>

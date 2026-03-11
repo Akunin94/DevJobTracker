@@ -37,6 +37,17 @@ function handleDelete(id: string) {
   store.deleteJob(id)
   toast.error('Job deleted')
 }
+
+// Keyboard shortcut: N = new job (ignore when typing in inputs)
+onMounted(() => {
+  const handler = (e: KeyboardEvent) => {
+    const tag = (e.target as HTMLElement).tagName
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return
+    if (e.key === 'n' || e.key === 'N') openAdd()
+  }
+  window.addEventListener('keydown', handler)
+  onUnmounted(() => window.removeEventListener('keydown', handler))
+})
 </script>
 
 <template>
