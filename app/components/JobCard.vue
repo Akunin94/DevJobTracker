@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { JOB_STATUSES } from '~/types/job'
 import type { Job, JobStatus } from '~/types/job'
+import { useRelativeTime } from '~/composables/useRelativeTime'
+
+const { relativeTime } = useRelativeTime()
 
 const props = defineProps<{ job: Job }>()
 const emit = defineEmits<{
@@ -72,8 +75,9 @@ function moveTo(status: JobStatus) {
 
     <!-- Footer -->
     <div v-else class="mt-3 flex items-center justify-between">
-      <span class="text-xs text-slate-500">
+      <span class="text-xs text-slate-500" :title="new Date(job.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })">
         {{ new Date(job.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) }}
+        <span class="text-slate-600">· {{ relativeTime(job.createdAt) }}</span>
       </span>
 
       <!-- Normal actions (shown on hover) -->
