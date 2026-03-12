@@ -87,8 +87,21 @@ export const useJobsStore = defineStore('jobs', () => {
     jobs.value = jobs.value.filter(j => j.id !== id)
   }
 
-  function moveJob(id: string, status: JobStatus) {
-    return updateJob(id, { status })
+  async function moveJob(id: string, status: JobStatus) {
+    // Optimistic update — move card instantly, revert on error
+    const job = jobs.value.find(j => j.id === id)
+    const prevStatus = job?.status
+    if (job) job.status = status
+
+    const { error: err } = await supabase
+      .from('jobs')
+      .update({ status, updated_at: new Date().toISOString() })
+      .eq('id', id)
+
+    if (err) {
+      error.value = err.message
+      if (job && prevStatus) job.status = prevStatus // revert
+    }
   }
 
   return { jobs, loading, error, jobsByStatus, fetchJobs, addJob, updateJob, deleteJob, moveJob }

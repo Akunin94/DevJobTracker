@@ -6,6 +6,7 @@ import { useJobsStore } from '~/stores/jobs'
 
 const props = defineProps<{
   filteredByStatus: (status: JobStatus) => Job[]
+  loading?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -52,8 +53,14 @@ const colStyles: Record<string, { dot: string; count: string; drag: string }> = 
         </span>
       </div>
 
+      <!-- Skeleton while loading -->
+      <div v-if="props.loading" class="flex flex-col gap-2.5">
+        <JobCardSkeleton v-for="n in 3" :key="n" />
+      </div>
+
       <!-- Cards -->
       <draggable
+        v-else
         :model-value="props.filteredByStatus(col.value)"
         group="jobs"
         item-key="id"

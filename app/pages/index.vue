@@ -13,6 +13,7 @@ const store = useJobsStore()
 
 if (import.meta.client) {
   await store.fetchJobs()
+  if (store.error) toast.error(store.error)
 }
 const { query, filteredByStatus } = useJobFilters(toRef(store, 'jobs'))
 
@@ -29,20 +30,20 @@ function openEdit(job: Job) {
   showForm.value = true
 }
 
-function handleSubmit(data: JobFormData) {
+async function handleSubmit(data: JobFormData) {
   if (editingJob.value) {
-    store.updateJob(editingJob.value.id, data)
-    toast.success('Job updated')
+    await store.updateJob(editingJob.value.id, data)
+    store.error ? toast.error(store.error) : toast.success('Job updated')
   } else {
-    store.addJob(data)
-    toast.success('Job added')
+    await store.addJob(data)
+    store.error ? toast.error(store.error) : toast.success('Job added')
   }
   showForm.value = false
 }
 
-function handleDelete(id: string) {
-  store.deleteJob(id)
-  toast.error('Job deleted')
+async function handleDelete(id: string) {
+  await store.deleteJob(id)
+  store.error ? toast.error(store.error) : toast.success('Job deleted')
 }
 
 // Keyboard shortcut: N = new job (ignore when typing in inputs)
@@ -115,7 +116,7 @@ onMounted(() => {
 
     <!-- Board -->
     <main class="mx-auto max-w-screen-2xl p-4 sm:p-6">
-      <KanbanBoard :filtered-by-status="filteredByStatus" @edit="openEdit" @delete="handleDelete" />
+      <KanbanBoard :filtered-by-status="filteredByStatus" :loading="store.loading" @edit="openEdit" @delete="handleDelete" />
     </main>
 
     <!-- Modal -->
