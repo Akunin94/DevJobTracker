@@ -7,6 +7,10 @@ import type { Job, JobFormData } from '~/types/job'
 useHead({ title: 'Dev Job Tracker' })
 
 const store = useJobsStore()
+
+if (import.meta.client) {
+  await store.fetchJobs()
+}
 const { query, filteredByStatus } = useJobFilters(toRef(store, 'jobs'))
 
 const showForm = ref(false)

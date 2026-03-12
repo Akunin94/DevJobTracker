@@ -1,57 +1,93 @@
 import { defineStore } from 'pinia'
 import type { Job, JobStatus, JobFormData } from '~/types/job'
 
-const STORAGE_KEY = 'devjobtracker:jobs'
+// Map Supabase row (snake_case) → Job (camelCase)
+function rowToJob(row: Record<string, unknown>): Job {
+  return {
+    id: row.id as string,
+    company: row.company as string,
+    position: row.position as string,
+    url: (row.url as string) || undefined,
+    salary: (row.salary as string) || undefined,
+    status: row.status as JobStatus,
+    notes: (row.notes as string) ?? '',
+    createdAt: row.created_at as string,
+    updatedAt: row.updated_at as string,
+  }
+}
 
 export const useJobsStore = defineStore('jobs', () => {
+  const supabase = useSupabaseClient()
+
   const jobs = ref<Job[]>([])
-
-  // Load from localStorage on init
-  if (import.meta.client) {
-    const stored = localStorage.getItem(STORAGE_KEY)
-    if (stored) {
-      try {
-        jobs.value = JSON.parse(stored)
-      } catch {
-        jobs.value = []
-      }
-    }
-  }
-
-  // Persist to localStorage on every change
-  watch(jobs, val => {
-    if (import.meta.client) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(val))
-    }
-  }, { deep: true })
+  const loading = ref(false)
+  const error = ref<string | null>(null)
 
   const jobsByStatus = computed(() =>
     (status: JobStatus) => jobs.value.filter(j => j.status === status)
   )
 
-  function addJob(data: JobFormData) {
-    const now = new Date().toISOString()
-    jobs.value.push({
-      ...data,
-      id: crypto.randomUUID(),
-      createdAt: now,
-      updatedAt: now,
-    })
+  async function fetchJobs() {
+    loading.value = true
+    error.value = null
+    const { data, error: err } = await supabase
+      .from('jobs')
+      .select('*')
+      .order('created_at', { ascending: false })
+    if (err) {
+      error.value = err.message
+    } else {
+      jobs.value = (data ?? []).map(rowToJob)
+    }
+    loading.value = false
   }
 
-  function updateJob(id: string, patch: Partial<JobFormData>) {
-    const job = jobs.value.find(j => j.id === id)
-    if (!job) return
-    Object.assign(job, patch, { updatedAt: new Date().toISOString() })
+  async function addJob(data: JobFormData) {
+    const { data: row, error: err } = await supabase
+      .from('jobs')
+      .insert({
+        company: data.company,
+        position: data.position,
+        url: data.url || null,
+        salary: data.salary || null,
+        status: data.status,
+        notes: data.notes,
+      })
+      .select()
+      .single()
+    if (err) { error.value = err.message; return }
+    jobs.value.unshift(rowToJob(row))
   }
 
-  function deleteJob(id: string) {
+  async function updateJob(id: string, patch: Partial<JobFormData>) {
+    const update: Record<string, unknown> = { updated_at: new Date().toISOString() }
+    if (patch.company !== undefined) update.company = patch.company
+    if (patch.position !== undefined) update.position = patch.position
+    if (patch.url !== undefined) update.url = patch.url || null
+    if (patch.salary !== undefined) update.salary = patch.salary || null
+    if (patch.status !== undefined) update.status = patch.status
+    if (patch.notes !== undefined) update.notes = patch.notes
+
+    const { data: row, error: err } = await supabase
+      .from('jobs')
+      .update(update)
+      .eq('id', id)
+      .select()
+      .single()
+    if (err) { error.value = err.message; return }
+    const idx = jobs.value.findIndex(j => j.id === id)
+    if (idx !== -1) jobs.value[idx] = rowToJob(row)
+  }
+
+  async function deleteJob(id: string) {
+    const { error: err } = await supabase.from('jobs').delete().eq('id', id)
+    if (err) { error.value = err.message; return }
     jobs.value = jobs.value.filter(j => j.id !== id)
   }
 
   function moveJob(id: string, status: JobStatus) {
-    updateJob(id, { status })
+    return updateJob(id, { status })
   }
 
-  return { jobs, jobsByStatus, addJob, updateJob, deleteJob, moveJob }
+  return { jobs, loading, error, jobsByStatus, fetchJobs, addJob, updateJob, deleteJob, moveJob }
 })
