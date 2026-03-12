@@ -4,6 +4,8 @@ import { JOB_STATUSES } from '~/types/job'
 import type { JobFormData, JobStatus } from '~/types/job'
 import { useJobsStore } from '~/stores/jobs'
 
+definePageMeta({ middleware: 'auth' })
+
 const route = useRoute()
 const router = useRouter()
 const store = useJobsStore()

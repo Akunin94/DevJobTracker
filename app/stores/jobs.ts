@@ -43,6 +43,7 @@ export const useJobsStore = defineStore('jobs', () => {
   }
 
   async function addJob(data: JobFormData) {
+    const { data: { session } } = await supabase.auth.getSession()
     const { data: row, error: err } = await supabase
       .from('jobs')
       .insert({
@@ -52,6 +53,7 @@ export const useJobsStore = defineStore('jobs', () => {
         salary: data.salary || null,
         status: data.status,
         notes: data.notes,
+        user_id: session?.user?.id ?? null,
       })
       .select()
       .single()

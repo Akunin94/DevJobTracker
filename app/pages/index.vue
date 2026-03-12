@@ -4,8 +4,11 @@ import { useJobsStore } from '~/stores/jobs'
 import { useJobFilters } from '~/composables/useJobFilters'
 import type { Job, JobFormData } from '~/types/job'
 
+definePageMeta({ middleware: 'auth' })
 useHead({ title: 'Dev Job Tracker' })
 
+const supabase = useSupabaseClient()
+const user = useSupabaseUser()
 const store = useJobsStore()
 
 if (import.meta.client) {
@@ -81,7 +84,7 @@ onMounted(() => {
         </div>
 
         <!-- Right side -->
-        <div class="flex items-center gap-4 ml-auto">
+        <div class="flex items-center gap-3 ml-auto">
           <span class="hidden text-sm text-slate-500 sm:block">
             <span class="font-semibold text-slate-200">{{ store.jobs.length }}</span> jobs
           </span>
@@ -91,6 +94,21 @@ onMounted(() => {
           >
             + Add Job
           </button>
+          <!-- User -->
+          <div class="flex items-center gap-2">
+            <img
+              v-if="user?.user_metadata?.avatar_url"
+              :src="user.user_metadata.avatar_url"
+              :alt="user.user_metadata.user_name"
+              class="h-7 w-7 rounded-full ring-1 ring-white/20"
+            />
+            <button
+              class="text-xs text-slate-400 hover:text-white transition-colors"
+              @click="supabase.auth.signOut().then(() => navigateTo('/login'))"
+            >
+              Sign out
+            </button>
+          </div>
         </div>
       </div>
     </header>
