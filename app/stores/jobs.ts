@@ -20,7 +20,7 @@ export const useJobsStore = defineStore('jobs', () => {
   const supabase = useSupabaseClient()
 
   const jobs = ref<Job[]>([])
-  const loading = ref(false)
+  const loading = ref(true)
   const error = ref<string | null>(null)
 
   const jobsByStatus = computed(() =>

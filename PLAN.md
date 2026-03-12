@@ -128,11 +128,31 @@ export const useJobsStore = defineStore('jobs', () => {
 - [ ] Wrap column job lists with `<draggable>`
 - [ ] Call `moveJob` on drop to update status in store
 
-### Phase 9 — Supabase (optional)
-- [ ] Create Supabase project, define `jobs` table matching `Job` type
-- [ ] Replace localStorage logic in store with Supabase client calls
-- [ ] Add GitHub OAuth via Supabase Auth
-- [ ] Handle loading / error states in UI
+### Phase 9 — Supabase ✅
+- [x] Create Supabase project, define `jobs` table matching `Job` type
+- [x] Replace localStorage logic in store with Supabase client calls
+- [x] Handle loading / error states in store
+
+### Phase 10 — GitHub OAuth
+- [ ] Enable GitHub provider in Supabase dashboard + create GitHub OAuth App
+- [ ] Add `user_id` column to `jobs` table + RLS policies (users see only their own jobs)
+- [ ] Create `pages/login.vue` with "Sign in with GitHub" button
+- [ ] Add auth middleware to protect `/` and `/jobs/[id]`
+- [ ] Show user avatar + "Sign out" in AppHeader
+- [ ] Pass `user_id` on insert in jobs store
+
+### Phase 11 — Deploy to Vercel
+- [ ] Push to GitHub (already done)
+- [ ] Connect repo to Vercel
+- [ ] Add `SUPABASE_URL` and `SUPABASE_KEY` env vars in Vercel dashboard
+- [ ] Set production URL as redirect URL in Supabase + GitHub OAuth App
+
+### Improvements Backlog
+- [ ] **Loading skeleton** — show skeleton cards while `store.loading` is true
+- [ ] **Optimistic updates** — move card immediately on drag, revert on error
+- [ ] **Realtime sync** — Supabase `channel().on('postgres_changes')` to sync across tabs
+- [ ] **Deadlines** — add `deadline` field, highlight overdue cards in red
+- [ ] **Statistics page** — `/stats` with application funnel chart (wishlist → offer conversion)
 
 ## Project Init
 
