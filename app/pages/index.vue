@@ -74,6 +74,10 @@ onMounted(() => {
           </div>
           <span class="text-base font-semibold text-white">Dev Job Tracker</span>
         </div>
+        <nav class="flex items-center gap-4 ml-2 text-sm">
+          <NuxtLink to="/" class="text-white font-medium">Board</NuxtLink>
+          <NuxtLink to="/stats" class="text-slate-400 hover:text-white transition-colors">Stats</NuxtLink>
+        </nav>
 
         <!-- Search -->
         <div class="relative flex-1 min-w-[160px] sm:max-w-xs">
