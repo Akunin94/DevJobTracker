@@ -42,6 +42,32 @@ export const useJobsStore = defineStore('jobs', () => {
     loading.value = false
   }
 
+  function subscribeToJobs() {
+    const channel = supabase
+      .channel('jobs-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'jobs' },
+        (payload) => {
+          if (payload.eventType === 'INSERT') {
+            const newJob = rowToJob(payload.new as Record<string, unknown>)
+            if (!jobs.value.find(j => j.id === newJob.id)) {
+              jobs.value.unshift(newJob)
+            }
+          } else if (payload.eventType === 'UPDATE') {
+            const updated = rowToJob(payload.new as Record<string, unknown>)
+            const idx = jobs.value.findIndex(j => j.id === updated.id)
+            if (idx !== -1) jobs.value[idx] = updated
+          } else if (payload.eventType === 'DELETE') {
+            jobs.value = jobs.value.filter(j => j.id !== payload.old.id)
+          }
+        }
+      )
+      .subscribe()
+
+    return () => supabase.removeChannel(channel)
+  }
+
   async function addJob(data: JobFormData) {
     const { data: { session } } = await supabase.auth.getSession()
     const { data: row, error: err } = await supabase
@@ -104,5 +130,5 @@ export const useJobsStore = defineStore('jobs', () => {
     }
   }
 
-  return { jobs, loading, error, jobsByStatus, fetchJobs, addJob, updateJob, deleteJob, moveJob }
+  return { jobs, loading, error, jobsByStatus, fetchJobs, subscribeToJobs, addJob, updateJob, deleteJob, moveJob }
 })

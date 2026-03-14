@@ -15,6 +15,10 @@ if (import.meta.client) {
   await store.fetchJobs()
   if (store.error) toast.error(store.error)
 }
+
+let unsubscribe: (() => void) | undefined
+onMounted(() => { unsubscribe = store.subscribeToJobs() })
+onUnmounted(() => { unsubscribe?.() })
 const { query, filteredByStatus } = useJobFilters(toRef(store, 'jobs'))
 
 const showForm = ref(false)
@@ -105,7 +109,7 @@ onMounted(() => {
             />
             <button
               class="text-xs text-slate-400 hover:text-white transition-colors"
-              @click="supabase.auth.signOut().then(() => navigateTo('/login'))"
+              @click="supabase.auth.signOut().then(() => { navigateTo('/login') })"
             >
               Sign out
             </button>
