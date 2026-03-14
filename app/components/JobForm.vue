@@ -15,6 +15,7 @@ const form = reactive<JobFormData>({
   salary:   props.job?.salary   ?? '',
   status:   props.job?.status   ?? 'wishlist',
   notes:    props.job?.notes    ?? '',
+  deadline: props.job?.deadline ?? '',
 })
 
 function handleSubmit() {
@@ -96,7 +97,7 @@ onMounted(() => {
             </select>
           </div>
 
-          <!-- URL + Salary -->
+          <!-- URL + Salary + Deadline -->
           <div class="grid grid-cols-2 gap-4">
             <div>
               <label class="mb-1.5 block text-xs font-medium text-slate-400">Job URL</label>
@@ -116,6 +117,16 @@ onMounted(() => {
                 class="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white placeholder-slate-500 focus:border-blue-500 focus:outline-none"
               />
             </div>
+          </div>
+
+          <!-- Deadline -->
+          <div>
+            <label class="mb-1.5 block text-xs font-medium text-slate-400">Deadline</label>
+            <input
+              v-model="form.deadline"
+              type="date"
+              class="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white focus:border-blue-500 focus:outline-none [color-scheme:dark]"
+            />
           </div>
 
           <!-- Notes -->

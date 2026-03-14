@@ -15,6 +15,19 @@ const emit = defineEmits<{
 const confirming = ref(false)
 const movingOpen = ref(false)
 
+const deadlineInfo = computed(() => {
+  if (!props.job.deadline) return null
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const dl = new Date(props.job.deadline + 'T00:00:00')
+  const diffDays = Math.round((dl.getTime() - today.getTime()) / 86400000)
+  const label = dl.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+  if (diffDays < 0) return { label, text: `${Math.abs(diffDays)}d overdue`, overdue: true }
+  if (diffDays === 0) return { label, text: 'Today', overdue: false, urgent: true }
+  if (diffDays <= 3) return { label, text: `${diffDays}d left`, overdue: false, urgent: true }
+  return { label, text: `${diffDays}d left`, overdue: false, urgent: false }
+})
+
 const otherStatuses = computed(() =>
   JOB_STATUSES.filter(s => s.value !== props.job.status)
 )
@@ -46,13 +59,28 @@ function moveTo(status: JobStatus) {
 </script>
 
 <template>
-  <div class="group relative cursor-grab rounded-lg border border-white/10 bg-slate-800/80 p-3.5 transition-all hover:border-white/20 hover:bg-slate-800 active:cursor-grabbing">
+  <div
+    class="group relative cursor-grab rounded-lg border p-3.5 transition-all hover:bg-slate-800 active:cursor-grabbing"
+    :class="deadlineInfo?.overdue
+      ? 'border-red-500/40 bg-red-950/30 hover:border-red-500/60'
+      : 'border-white/10 bg-slate-800/80 hover:border-white/20'"
+  >
     <!-- Company + position -->
     <NuxtLink :to="`/jobs/${job.id}`" class="block truncate text-sm font-semibold text-white hover:text-blue-300 transition-colors">{{ job.company }}</NuxtLink>
     <p class="mt-0.5 truncate text-xs text-slate-400">{{ job.position }}</p>
 
     <!-- Salary -->
     <p v-if="job.salary" class="mt-2 text-xs font-medium text-emerald-400">{{ job.salary }}</p>
+
+    <!-- Deadline -->
+    <div v-if="deadlineInfo" class="mt-2 flex items-center gap-1.5">
+      <svg class="h-3 w-3 shrink-0" :class="deadlineInfo.overdue ? 'text-red-400' : deadlineInfo.urgent ? 'text-amber-400' : 'text-slate-500'" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M12 6v6l4 2"/>
+      </svg>
+      <span class="text-xs" :class="deadlineInfo.overdue ? 'text-red-400 font-medium' : deadlineInfo.urgent ? 'text-amber-400' : 'text-slate-500'">
+        {{ deadlineInfo.label }} · {{ deadlineInfo.text }}
+      </span>
+    </div>
 
     <!-- Move picker (inline, replaces footer) -->
     <div v-if="movingOpen" class="mt-3">

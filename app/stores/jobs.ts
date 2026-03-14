@@ -11,6 +11,7 @@ function rowToJob(row: Record<string, unknown>): Job {
     salary: (row.salary as string) || undefined,
     status: row.status as JobStatus,
     notes: (row.notes as string) ?? '',
+    deadline: (row.deadline as string) || undefined,
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
   }
@@ -83,6 +84,7 @@ export const useJobsStore = defineStore('jobs', () => {
         salary: data.salary || null,
         status: data.status,
         notes: data.notes,
+        deadline: data.deadline || null,
         user_id: session?.user?.id ?? null,
       })
       .select()
@@ -99,6 +101,7 @@ export const useJobsStore = defineStore('jobs', () => {
     if (patch.salary !== undefined) update.salary = patch.salary || null
     if (patch.status !== undefined) update.status = patch.status
     if (patch.notes !== undefined) update.notes = patch.notes
+    if (patch.deadline !== undefined) update.deadline = patch.deadline || null
 
     const { data: row, error: err } = await supabase
       .from('jobs')

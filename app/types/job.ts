@@ -8,6 +8,7 @@ export interface Job {
   salary?: string
   status: JobStatus
   notes: string
+  deadline?: string  // ISO date YYYY-MM-DD
   createdAt: string
   updatedAt: string
 }
