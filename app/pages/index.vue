@@ -66,7 +66,7 @@ onMounted(() => {
         <!-- Logo -->
         <div class="flex items-center gap-2.5">
           <div class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-blue-500 text-xs font-bold leading-none">
-            DT
+            DJT
           </div>
           <span class="text-base font-semibold text-white">Dev Job Tracker</span>
         </div>

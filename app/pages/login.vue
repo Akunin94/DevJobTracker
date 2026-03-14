@@ -26,7 +26,7 @@ async function signInWithGitHub() {
     <div class="w-full max-w-sm rounded-2xl border border-white/10 bg-slate-900 p-8 text-center shadow-xl">
       <!-- Logo -->
       <div class="mx-auto mb-6 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500 text-lg font-bold text-white">
-        DT
+        DJT
       </div>
 
       <h1 class="mb-1 text-xl font-semibold text-white">Dev Job Tracker</h1>
