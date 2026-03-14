@@ -42,12 +42,16 @@ export const useJobsStore = defineStore('jobs', () => {
     loading.value = false
   }
 
-  function subscribeToJobs() {
+  async function subscribeToJobs() {
+    const { data: { session } } = await supabase.auth.getSession()
+    const userId = session?.user?.id
+    if (!userId) return () => {}
+
     const channel = supabase
       .channel('jobs-realtime')
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'jobs' },
+        { event: '*', schema: 'public', table: 'jobs', filter: `user_id=eq.${userId}` },
         (payload) => {
           if (payload.eventType === 'INSERT') {
             const newJob = rowToJob(payload.new as Record<string, unknown>)

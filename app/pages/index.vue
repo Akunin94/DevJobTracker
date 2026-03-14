@@ -17,7 +17,7 @@ if (import.meta.client) {
 }
 
 let unsubscribe: (() => void) | undefined
-onMounted(() => { unsubscribe = store.subscribeToJobs() })
+onMounted(async () => { unsubscribe = await store.subscribeToJobs() })
 onUnmounted(() => { unsubscribe?.() })
 const { query, filteredByStatus } = useJobFilters(toRef(store, 'jobs'))
 
