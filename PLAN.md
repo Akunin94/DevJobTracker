@@ -150,9 +150,9 @@ export const useJobsStore = defineStore('jobs', () => {
 ### Improvements Backlog
 - [x] **Loading skeleton** — show skeleton cards while `store.loading` is true
 - [x] **Optimistic updates** — move card immediately on drag, revert on error
-- [ ] **Realtime sync** — Supabase `channel().on('postgres_changes')` to sync across tabs
-- [ ] **Deadlines** — add `deadline` field, highlight overdue cards in red
-- [ ] **Statistics page** — `/stats` with application funnel chart (wishlist → offer conversion)
+- [x] **Realtime sync** — Supabase `channel().on('postgres_changes')` to sync across tabs
+- [x] **Deadlines** — add `deadline` field, highlight overdue cards in red
+- [x] **Statistics page** — `/stats` with application funnel chart (wishlist → offer conversion)
 
 ## Project Init
 

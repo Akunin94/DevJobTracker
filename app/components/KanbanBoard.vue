@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import draggable from 'vuedraggable'
+import { toast } from 'vue-sonner'
 import { JOB_STATUSES } from '~/types/job'
 import type { Job, JobStatus } from '~/types/job'
 import { useJobsStore } from '~/stores/jobs'
@@ -16,13 +17,35 @@ const emit = defineEmits<{
 
 const store = useJobsStore()
 
-function handleMove(id: string, status: JobStatus) {
-  store.moveJob(id, status)
+// Per-column mutable arrays. Use :list (not v-model) so vuedraggable mutates
+// them in-place via splice — this lets @change fire reliably.
+// The watch syncs from the store using splice (not reassignment) to keep
+// the same array references that vuedraggable holds.
+const colLists = reactive<Record<string, Job[]>>(
+  Object.fromEntries(JOB_STATUSES.map(s => [s.value, [] as Job[]]))
+)
+
+watch(
+  () => store.jobs,
+  (jobs) => {
+    JOB_STATUSES.forEach(s => {
+      const next = jobs.filter(j => j.status === s.value)
+      const col = colLists[s.value]
+      if (col) col.splice(0, col.length, ...next)
+    })
+  },
+  { immediate: true, deep: true },
+)
+
+async function handleMove(id: string, status: JobStatus) {
+  await store.moveJob(id, status)
+  if (store.error) toast.error(store.error)
 }
 
-function onDrop(colStatus: JobStatus, evt: { added?: { element: Job }; removed?: unknown }) {
+async function onDrop(colStatus: JobStatus, evt: { added?: { element: Job }; removed?: unknown }) {
   if (evt.added) {
-    store.moveJob(evt.added.element.id, colStatus)
+    await store.moveJob(evt.added.element.id, colStatus)
+    if (store.error) toast.error(store.error)
   }
 }
 
@@ -61,12 +84,11 @@ const colStyles: Record<string, { dot: string; count: string; drag: string }> = 
       <!-- Cards -->
       <draggable
         v-else
-        :model-value="props.filteredByStatus(col.value)"
+        :list="colLists[col.value]"
         group="jobs"
         item-key="id"
         class="flex flex-1 flex-col gap-2.5"
         ghost-class="opacity-30"
-        drag-class="rotate-1 scale-105"
         :class="{ [colStyles[col.value].drag]: true }"
         @change="onDrop(col.value, $event)"
       >
@@ -80,7 +102,7 @@ const colStyles: Record<string, { dot: string; count: string; drag: string }> = 
         </template>
         <template #footer>
           <div
-            v-if="props.filteredByStatus(col.value).length === 0"
+            v-if="(colLists[col.value]?.length ?? 0) === 0"
             class="flex flex-col items-center justify-center rounded-lg border border-dashed border-white/10 py-10 text-center"
           >
             <span class="mb-1 text-2xl">· · ·</span>
