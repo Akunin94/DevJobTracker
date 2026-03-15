@@ -170,3 +170,4 @@ git init && git add . && git commit -m "init: nuxt 3 + pinia + tailwind"
 - How reactive persist works without extra libraries
 - How to scale to Supabase (swapping one layer)
 - Kanban as a UI pattern for a state machine
+
