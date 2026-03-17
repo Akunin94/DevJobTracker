@@ -2,6 +2,7 @@
 import { JOB_STATUSES } from '~/types/job'
 import type { Job, JobStatus } from '~/types/job'
 import { useRelativeTime } from '~/composables/useRelativeTime'
+import { getDeadlineInfo } from '~/utils/deadline'
 
 const { relativeTime } = useRelativeTime()
 
@@ -15,18 +16,7 @@ const emit = defineEmits<{
 const confirming = ref(false)
 const movingOpen = ref(false)
 
-const deadlineInfo = computed(() => {
-  if (!props.job.deadline) return null
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  const dl = new Date(props.job.deadline + 'T00:00:00')
-  const diffDays = Math.round((dl.getTime() - today.getTime()) / 86400000)
-  const label = dl.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-  if (diffDays < 0) return { label, text: `${Math.abs(diffDays)}d overdue`, overdue: true }
-  if (diffDays === 0) return { label, text: 'Today', overdue: false, urgent: true }
-  if (diffDays <= 3) return { label, text: `${diffDays}d left`, overdue: false, urgent: true }
-  return { label, text: `${diffDays}d left`, overdue: false, urgent: false }
-})
+const deadlineInfo = computed(() => getDeadlineInfo(props.job.deadline))
 
 const otherStatuses = computed(() =>
   JOB_STATUSES.filter(s => s.value !== props.job.status)

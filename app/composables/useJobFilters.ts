@@ -1,3 +1,4 @@
+import { ref, computed, type Ref } from 'vue'
 import type { Job, JobStatus } from '~/types/job'
 
 export function useJobFilters(jobs: Ref<Job[]>) {
