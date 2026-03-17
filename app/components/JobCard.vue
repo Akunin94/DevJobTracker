@@ -98,8 +98,8 @@ function moveTo(status: JobStatus) {
         <span class="text-slate-600">· {{ relativeTime(job.createdAt) }}</span>
       </span>
 
-      <!-- Normal actions (shown on hover) -->
-      <div v-if="!confirming" class="flex items-center gap-2 opacity-0 transition-opacity group-hover:opacity-100">
+      <!-- Normal actions (always visible on mobile, hover-only on desktop) -->
+      <div v-if="!confirming" class="flex items-center gap-2 sm:opacity-0 sm:transition-opacity sm:group-hover:opacity-100">
         <button
           class="text-xs text-slate-400 hover:text-white transition-colors"
           @click="movingOpen = true"

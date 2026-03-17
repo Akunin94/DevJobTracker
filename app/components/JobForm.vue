@@ -61,7 +61,7 @@ onMounted(() => {
         <!-- Form -->
         <form class="space-y-4 px-6 py-5" @submit.prevent="handleSubmit">
           <!-- Company + Position -->
-          <div class="grid grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
             <div>
               <label class="mb-1.5 block text-xs font-medium text-slate-400">Company *</label>
               <input
@@ -98,7 +98,7 @@ onMounted(() => {
           </div>
 
           <!-- URL + Salary + Deadline -->
-          <div class="grid grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
             <div>
               <label class="mb-1.5 block text-xs font-medium text-slate-400">Job URL</label>
               <input

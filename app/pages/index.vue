@@ -66,21 +66,50 @@ onMounted(() => {
   <div class="min-h-screen bg-slate-950 text-white">
     <!-- Top nav -->
     <header class="border-b border-slate-800 bg-slate-900 px-4 py-3 sm:px-6 sm:py-3.5">
-      <div class="mx-auto flex max-w-screen-2xl flex-wrap items-center gap-3">
+      <div class="mx-auto flex max-w-screen-2xl flex-wrap items-center gap-x-3 gap-y-2">
         <!-- Logo -->
-        <div class="flex items-center gap-2.5">
+        <div class="flex shrink-0 items-center gap-2.5">
           <div class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-blue-500 text-xs font-bold leading-none">
             DJT
           </div>
           <span class="text-base font-semibold text-white">Dev Job Tracker</span>
         </div>
-        <nav class="flex items-center gap-4 ml-2 text-sm">
-          <NuxtLink to="/" class="text-white font-medium">Board</NuxtLink>
-          <NuxtLink to="/stats" class="text-slate-400 hover:text-white transition-colors">Stats</NuxtLink>
+        <!-- Nav -->
+        <nav class="ml-2 flex shrink-0 items-center gap-4 text-sm">
+          <NuxtLink to="/" class="font-medium text-white">Board</NuxtLink>
+          <NuxtLink to="/stats" class="text-slate-400 transition-colors hover:text-white">Stats</NuxtLink>
         </nav>
 
-        <!-- Search -->
-        <div class="relative flex-1 min-w-[160px] sm:max-w-xs">
+        <!-- Right side (ml-auto keeps it on row 1 alongside logo/nav) -->
+        <div class="ml-auto flex shrink-0 items-center gap-3">
+          <span class="hidden text-sm text-slate-500 sm:block">
+            <span class="font-semibold text-slate-200">{{ store.jobs.length }}</span> jobs
+          </span>
+          <button
+            class="rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-blue-500 active:bg-blue-700 sm:px-4 sm:py-2"
+            @click="openAdd"
+          >
+            <span class="sm:hidden">+ Add</span>
+            <span class="hidden sm:inline">+ Add Job</span>
+          </button>
+          <div class="flex items-center gap-2">
+            <img
+              v-if="user?.user_metadata?.avatar_url"
+              :src="user.user_metadata.avatar_url"
+              :alt="user.user_metadata.user_name"
+              class="h-7 w-7 rounded-full ring-1 ring-white/20"
+            />
+            <button
+              class="hidden text-xs text-slate-400 transition-colors hover:text-white sm:block"
+              @click="supabase.auth.signOut().then(() => { navigateTo('/login') })"
+            >
+              Sign out
+            </button>
+          </div>
+        </div>
+
+        <!-- Search: w-full forces its own row on mobile; sm: reverts to inline flex item -->
+        <div class="relative w-full sm:flex-1 sm:max-w-xs">
           <svg class="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <circle cx="11" cy="11" r="8" /><path stroke-linecap="round" d="M21 21l-4.35-4.35" />
           </svg>
@@ -90,34 +119,6 @@ onMounted(() => {
             placeholder="Search jobs…"
             class="w-full rounded-lg border border-white/10 bg-slate-800 py-1.5 pl-8 pr-3 text-sm text-slate-200 placeholder-slate-500 outline-none transition-colors focus:border-blue-500/60 focus:ring-1 focus:ring-blue-500/30"
           />
-        </div>
-
-        <!-- Right side -->
-        <div class="flex items-center gap-3 ml-auto">
-          <span class="hidden text-sm text-slate-500 sm:block">
-            <span class="font-semibold text-slate-200">{{ store.jobs.length }}</span> jobs
-          </span>
-          <button
-            class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500 active:bg-blue-700 transition-colors"
-            @click="openAdd"
-          >
-            + Add Job
-          </button>
-          <!-- User -->
-          <div class="flex items-center gap-2">
-            <img
-              v-if="user?.user_metadata?.avatar_url"
-              :src="user.user_metadata.avatar_url"
-              :alt="user.user_metadata.user_name"
-              class="h-7 w-7 rounded-full ring-1 ring-white/20"
-            />
-            <button
-              class="text-xs text-slate-400 hover:text-white transition-colors"
-              @click="supabase.auth.signOut().then(() => { navigateTo('/login') })"
-            >
-              Sign out
-            </button>
-          </div>
         </div>
       </div>
     </header>
