@@ -92,8 +92,18 @@ const statusBarColor: Record<string, string> = {
     </header>
 
     <main class="mx-auto max-w-screen-lg p-4 sm:p-6 space-y-6">
+
+      <!-- Summary cards skeleton -->
+      <div v-if="store.loading" class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div v-for="n in 4" :key="n" class="animate-pulse rounded-xl border border-white/10 bg-slate-900 p-4">
+          <div class="h-3 w-16 rounded bg-slate-700" />
+          <div class="mt-3 h-8 w-12 rounded bg-slate-700" />
+          <div class="mt-2 h-2.5 w-20 rounded bg-slate-700/60" />
+        </div>
+      </div>
+
       <!-- Summary cards -->
-      <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div v-else class="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div class="rounded-xl border border-white/10 bg-slate-900 p-4">
           <p class="text-xs text-slate-400">Total jobs</p>
           <p class="mt-1 text-3xl font-bold text-white">{{ total }}</p>
@@ -115,7 +125,34 @@ const statusBarColor: Record<string, string> = {
         </div>
       </div>
 
-      <div class="grid gap-4 sm:grid-cols-2">
+      <!-- Breakdown + Funnel skeleton -->
+      <div v-if="store.loading" class="grid gap-4 sm:grid-cols-2">
+        <div class="animate-pulse rounded-xl border border-white/10 bg-slate-900 p-5">
+          <div class="mb-4 h-3.5 w-32 rounded bg-slate-700" />
+          <div class="space-y-4">
+            <div v-for="n in 5" :key="n">
+              <div class="mb-1.5 flex items-center justify-between">
+                <div class="h-3 rounded bg-slate-700" :style="{ width: (40 + n * 8) + 'px' }" />
+                <div class="h-3 w-8 rounded bg-slate-700/60" />
+              </div>
+              <div class="h-2 w-full rounded-full bg-slate-800">
+                <div class="h-full rounded-full bg-slate-700/60" :style="{ width: (15 + n * 10) + '%' }" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="animate-pulse rounded-xl border border-white/10 bg-slate-900 p-5">
+          <div class="mb-4 h-3.5 w-36 rounded bg-slate-700" />
+          <div class="space-y-2">
+            <div v-for="n in 5" :key="n" class="flex items-center justify-between rounded-lg bg-slate-800/60 px-4 py-2.5">
+              <div class="h-3 rounded bg-slate-700" :style="{ width: (80 + n * 15) + 'px' }" />
+              <div class="h-3 w-10 rounded bg-slate-700/60" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div v-else class="grid gap-4 sm:grid-cols-2">
         <!-- Breakdown by status -->
         <div class="rounded-xl border border-white/10 bg-slate-900 p-5">
           <h2 class="mb-4 text-sm font-semibold text-slate-200">Breakdown by status</h2>
@@ -160,7 +197,7 @@ const statusBarColor: Record<string, string> = {
       </div>
 
       <!-- Deadlines -->
-      <div v-if="overdue > 0 || upcoming.length > 0" class="rounded-xl border border-white/10 bg-slate-900 p-5">
+      <div v-if="!store.loading && (overdue > 0 || upcoming.length > 0)" class="rounded-xl border border-white/10 bg-slate-900 p-5">
         <h2 class="mb-4 text-sm font-semibold text-slate-200">Deadlines</h2>
         <div class="grid gap-3 sm:grid-cols-2">
           <!-- Overdue alert -->
@@ -196,7 +233,7 @@ const statusBarColor: Record<string, string> = {
       </div>
 
       <!-- Empty state -->
-      <div v-if="total === 0" class="rounded-xl border border-dashed border-white/10 p-12 text-center">
+      <div v-if="!store.loading && total === 0" class="rounded-xl border border-dashed border-white/10 p-12 text-center">
         <p class="text-slate-400">No jobs yet — add some from the <NuxtLink to="/" class="text-blue-400 hover:text-blue-300">board</NuxtLink>.</p>
       </div>
     </main>
