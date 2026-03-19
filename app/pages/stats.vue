@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useJobsStore } from '~/stores/jobs'
+import { useJobExport } from '~/composables/useJobExport'
 import { JOB_STATUSES } from '~/types/job'
 
 definePageMeta({ middleware: 'auth' })
@@ -8,6 +9,7 @@ useHead({ title: 'Stats — Dev Job Tracker' })
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
 const store = useJobsStore()
+const { exportToCsv } = useJobExport()
 
 if (import.meta.client && !store.jobs.length) {
   await store.fetchJobs()
@@ -76,6 +78,14 @@ const statusBarColor: Record<string, string> = {
           <NuxtLink to="/stats" class="text-white font-medium">Stats</NuxtLink>
         </nav>
         <div class="ml-auto flex items-center gap-2">
+          <button
+            v-if="!store.loading && store.jobs.length > 0"
+            class="flex items-center gap-1.5 rounded-lg border border-white/10 bg-slate-800 px-3 py-1.5 text-xs text-slate-300 transition-colors hover:bg-slate-700 hover:text-white"
+            @click="exportToCsv(store.jobs)"
+          >
+            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            Export CSV
+          </button>
           <img
             v-if="user?.user_metadata?.avatar_url"
             :src="user.user_metadata.avatar_url"
