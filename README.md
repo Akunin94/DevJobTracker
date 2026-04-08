@@ -4,6 +4,13 @@ A production-ready job search tracking application built with **Nuxt 3**, **Vue 
 
 **Live Demo**: [dev-job-tracker.vercel.app](https://dev-job-tracker.vercel.app)
 
+## Screenshots:
+<img width="491" height="412" alt="image" src="https://github.com/user-attachments/assets/82e473b5-2b6d-4f0e-87a1-1d9794256bde" />
+<img width="1584" height="383" alt="image" src="https://github.com/user-attachments/assets/48e88d67-6123-451d-b385-365383ba0428" />
+<img width="583" height="624" alt="image" src="https://github.com/user-attachments/assets/e32f606d-d7ad-4327-8999-97ff0ae67db4" />
+<img width="803" height="705" alt="image" src="https://github.com/user-attachments/assets/4dfaa721-771d-42d7-a049-8b42b01ab2e3" />
+
+
 ---
 
 ## Features
